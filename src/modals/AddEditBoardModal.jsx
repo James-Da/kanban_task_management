@@ -3,9 +3,15 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import crossIcon from "../assets/icon-cross.svg";
+import { useDispatch } from "react-redux";
+import boardSlice from "../redux/boardsSlice";
 
 const AddEditBoardModal = ({ setBoardModalOpen, type }) => {
+	const dispatch = useDispatch();
+
 	const [name, setName] = useState("");
+	const [isValid, setIsValid] = useState(true);
+
 	const [newColumns, setNewColumns] = useState([
 		{ name: "Todo", task: [], id: uuidv4() },
 		{ name: "Doing", task: [], id: uuidv4() },
@@ -23,11 +29,36 @@ const AddEditBoardModal = ({ setBoardModalOpen, type }) => {
 	const onDelete = (id) => {
 		setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
 	};
+
+	const validate = () => {
+		setIsValid(false);
+		if (!name.trim()) {
+			return false;
+		}
+
+		// Checks that there are no empty values in newColums
+		for (let i = 0; i < newColumns.length; i++) {
+			if (!newColumns[i].name.trim()) {
+				return false;
+			}
+		}
+
+		setIsValid(true);
+		return true;
+	};
+
+	const onSubmit = (type) => {
+		setBoardModalOpen(false);
+		if (type === "add") {
+			dispatch(boardSlice.actions.addBoard({ name, newColumns }));
+		} else {
+			dispatch(boardSlice.actions.editBoard({ name, newColumns }));
+		}
+	};
 	return (
 		<div
 			onClick={(e) => {
 				if (e.target !== e.currentTarget) {
-					console.log("IF statement in AddEditBoardModal.js");
 					return;
 				}
 				setBoardModalOpen(false);
@@ -84,6 +115,31 @@ const AddEditBoardModal = ({ setBoardModalOpen, type }) => {
 							/>
 						</div>
 					))}
+				</div>
+
+				{/* ADD NEW COLUMNs  */}
+				<div>
+					<button
+						onClick={() => {
+							setNewColumns((state) => [
+								...state,
+								{ name: "", task: [], id: uuidv4() },
+							]);
+						}}
+						className="w-full items-center hover:opacity-75 dark:text-[#635fc7] dark:bg-white text-white bg-[#635fc7] mt-2 py-2 rounded-full"
+					>
+						+ Add new column
+					</button>
+
+					<button
+						onClick={() => {
+							const isValid = validate();
+							if (isValid === true) onSubmit(type);
+						}}
+						className="w-full items-center hover:opacity-75 dark:text-white dark:bg-[#635fc7] mt-8 relative text-white bg-[#635fc7] py-2 rounded-full"
+					>
+						{type === "add" ? "Create New Board" : "Save Changes"}
+					</button>
 				</div>
 			</div>
 		</div>

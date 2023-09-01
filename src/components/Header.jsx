@@ -8,6 +8,7 @@ import AddEditBoardModal from "../modals/AddEditBoardModal";
 
 const Header = ({ boardModalOpen, setBoardModalOpen }) => {
 	const [openDropDown, setOpenDropDown] = useState(false);
+	const [boardType, setBoardType] = useState("add");
 	return (
 		<div className="p-4 fixed left-0 bg-white dark:bg-[#2b2c37] right-0 ">
 			<header className="flex justify-between dark:text-white items-center">
@@ -49,7 +50,10 @@ const Header = ({ boardModalOpen, setBoardModalOpen }) => {
 			)}
 
 			{boardModalOpen && (
-				<AddEditBoardModal setBoardModalOpen={setBoardModalOpen} />
+				<AddEditBoardModal
+					type={boardType}
+					setBoardModalOpen={setBoardModalOpen}
+				/>
 			)}
 		</div>
 	);
